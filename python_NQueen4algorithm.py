@@ -1,54 +1,57 @@
-#201721198590   信息科学学院   刘璐
-#回溯法解决N皇后问题
+'''
+201721198590   信息科学学院  刘璐
+python 回溯法  爬楼梯问题
+某楼梯有n层台阶，每步只能走1级台阶，或2级台阶。从下向上爬楼梯，有多少种爬法？
+'''
+n = 6
+# 楼梯阶数
 
-global N
-N = 4
-
-
-def printSolution(board):
-    for i in range(N):
-        for j in range(N):
-            print(board[i][j], end="")
-        print()
-    print()
+x = []  # 一个解（长度不固定，1-2数组，表示该步走的台阶数）
+X = []  # 一组解
 
 
-def isSafe(board, row, col):
-    for i in range(col):
-        if board[row][i] == 1:
-            return False
-    for i, j in zip(range(row, -1, -1), range(col, -1, -1)):
-        if board[i][j] == 1:
-            return False
-    for i, j in zip(range(row, N, 1), range(col, -1, -1)):
-        if board[i][j] == 1:
-            return False
-    return True
+# 冲突检测
+def conflict(k):
+    global n, x, X
+
+    # 部分解步的步数之和超过总台阶数
+    if sum(x[:k + 1]) > n:
+        return True
+
+    return False  # 无冲突
 
 
-def solveNQUtil(board, col):
-    if col >= N:
-        printSolution(board)
+# 回溯法（递归版本）
+def climb_stairs(k):  # 走第k步
+    global n, x, X
+
+    if sum(x) == n:  # 已走的所有步数之和等于楼梯总台阶数
+        print(x)
+        # X.append(x[:]) # 保存（一个解）
     else:
-        for i in range(N):
-            if isSafe(board, i, col):
-                board[i][col] = 1
-                solveNQUtil(board, col + 1)
-                board[i][col] = 0
-        return False
+        for i in [1, 2]:  # 第k步这个元素的状态空间为[1,2]
+            x.append(i)
+            if not conflict(k):  # 剪枝
+                climb_stairs(k + 1)
+            x.pop()  # 回溯
 
 
-def solveNQ():
+# 测试
+climb_stairs(0)  # 走第0步
 
-    board = [[0 for i in range(N)] for j in range(N)]
-
-    if not solveNQUtil(board, 0):
-        print("Solution does not exist")
-        return False
-
-    printSolution(board)
-    return True
-
-
-if __name__ == "__main__":
-solveNQ()
+'''
+其中一个解：
+[1, 1, 1, 1, 1, 1]
+[1, 1, 1, 1, 2]
+[1, 1, 1, 2, 1]
+[1, 1, 2, 1, 1]
+[1, 1, 2, 2]
+[1, 2, 1, 1, 1]
+[1, 2, 1, 2]
+[1, 2, 2, 1]
+[2, 1, 1, 1, 1]
+[2, 1, 1, 2]
+[2, 1, 2, 1]
+[2, 2, 1, 1]
+[2, 2, 2]
+'''
